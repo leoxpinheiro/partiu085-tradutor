@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import type { ParsedOutput } from '../types';
 import Loader from './Loader';
 import CopyButton from './CopyButton';
-import { generateTitleForText } from '../services/geminiService';
 
 interface OutputSectionProps {
   outputSections: ParsedOutput[];
@@ -14,29 +13,18 @@ interface OutputSectionProps {
 
 const OutputSection: React.FC<OutputSectionProps> = ({ outputSections, isLoading, error, onSaveHistory, showSuccessMessage }) => {
   const [titleToSave, setTitleToSave] = useState('');
-  const [isTitleLoading, setIsTitleLoading] = useState(false);
   const currentContent = outputSections[0]?.content || '';
 
   useEffect(() => {
-    if (currentContent && !isLoading) {
-      setIsTitleLoading(true);
-      generateTitleForText(currentContent)
-        .then(title => {
-          setTitleToSave(title);
-        })
-        .catch(err => {
-            console.error(err);
-            setTitleToSave(''); // Clear title on error
-        })
-        .finally(() => {
-          setIsTitleLoading(false);
-        });
+    if (!currentContent) {
+      setTitleToSave('');
     }
-  }, [currentContent, isLoading]);
+  }, [currentContent]);
+
 
   const handleSaveClick = () => {
     if (currentContent) {
-        onSaveHistory(currentContent, titleToSave);
+        onSaveHistory(currentContent, titleToSave || 'Sem título');
         setTitleToSave('');
     }
   };
@@ -99,17 +87,15 @@ const OutputSection: React.FC<OutputSectionProps> = ({ outputSections, isLoading
 
       {currentContent && (
         <div className="mt-auto pt-4 border-t border-gray-100 shrink-0">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Título (sugerido pela IA)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Título para o Histórico</label>
             <div className="relative">
                 <input 
                     type="text" 
                     value={titleToSave}
                     onChange={(e) => setTitleToSave(e.target.value)}
-                    placeholder={isTitleLoading ? "Gerando título..." : "Ex.: Azul → ALL 30% bônus"}
+                    placeholder="Ex.: Azul → ALL 30% bônus"
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-green focus:border-transparent transition text-sm"
-                    disabled={isTitleLoading}
                 />
-                 {isTitleLoading && <div className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin rounded-full border-2 border-slate-400 border-t-transparent"></div>}
             </div>
         </div>
       )}

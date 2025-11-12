@@ -84,7 +84,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
               Adicionar rodapé automaticamente
             </label>
             <p id="auto-append-description" className="text-gray-500">
-              Se ativo, o rodapé correspondente será adicionado ao final de cada frase gerada.
+              Se ativo, o rodapé correspondente será adicionado ao final da mensagem gerada.
             </p>
           </div>
         </div>

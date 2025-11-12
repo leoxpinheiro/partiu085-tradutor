@@ -4,7 +4,7 @@ import InputSection from './components/InputSection';
 import OutputSection from './components/OutputSection';
 import ImageWatermarkRemover from './components/ImageWatermarkRemover';
 import SettingsTab from './components/SettingsTab';
-import { generateAdaptedText, appendFooterToSentences } from './services/geminiService';
+import { generateAdaptedText } from './services/geminiService';
 import type { ParsedOutput, HistoryItem } from './types';
 
 const App: React.FC = () => {
@@ -54,15 +54,13 @@ const App: React.FC = () => {
     setOutputText([]);
 
     try {
-      const result = await generateAdaptedText(inputText);
-      let finalResult = result;
+      const footerToAppend = autoAppendLinks 
+        ? (activeTab === 'promocoes' ? promoFooter : resgateFooter)
+        : undefined;
 
-      if (autoAppendLinks) {
-        const footerToAppend = activeTab === 'promocoes' ? promoFooter : resgateFooter;
-        finalResult = appendFooterToSentences(result, footerToAppend);
-      }
+      const result = await generateAdaptedText(inputText, footerToAppend);
       
-      setOutputText([{ title: 'Texto para WhatsApp 💬', content: finalResult }]);
+      setOutputText([{ title: 'Texto para WhatsApp 💬', content: result }]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
     } finally {
