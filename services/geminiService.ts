@@ -78,3 +78,4 @@ export const processImageWithPrompt = async (base64Image: string, mimeType: stri
         throw new Error("Failed to process image with Gemini API.");
     }
 };
+// force vercel redeploy
