@@ -2,7 +2,7 @@ import { GoogleGenAI, Modality } from "@google/genai";
 import { SYSTEM_PROMPT } from '../constants';
 
 const getAiClient = () => {
-    const apiKey = process.env.API_KEY;
+   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!apiKey) {
         throw new Error("API key not found. The application is not configured correctly.");
     }
