@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { SYSTEM_PROMPT } from "../constants";
 
 const getAiClient = () => {
@@ -8,28 +8,30 @@ const getAiClient = () => {
     throw new Error("API key not found. The application is not configured correctly.");
   }
 
-  return new GoogleGenAI({ apiKey });
+  return new GoogleGenerativeAI(apiKey);
 };
 
 export const generateAdaptedText = async (userInput: string, footer?: string) => {
   try {
-    const ai = getAiClient();
+    const genAI = getAiClient();
 
-    const fullPrompt = SYSTEM_PROMPT.replace('{{ texto_usuario }}', userInput);
-
-    const response = await ai.models.generateText({
+    const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
-      text: fullPrompt
     });
 
-    if (!response.outputText) {
-      throw new Error("Gemini returned no text.");
+    const fullPrompt = SYSTEM_PROMPT.replace("{{ texto_usuario }}", userInput);
+
+    const result = await model.generateContent(fullPrompt);
+    const response = await result.response;
+    const text = response.text();
+
+    if (!text) {
+      throw new Error("Gemini returned empty response.");
     }
 
-    return response.outputText;
-
-  } catch (error) {
-    console.error("Gemini API Error:", error);
+    return text;
+  } catch (err) {
+    console.error("Gemini Error:", err);
     throw new Error("Failed to generate text from Gemini API.");
   }
 };
